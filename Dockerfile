@@ -1,12 +1,12 @@
 FROM kalilinux/kali-rolling:latest
-LABEL maintainer="admin@csalab.id"
-RUN sed -i "s/http.kali.org/mirrors.ocf.berkeley.edu/g" /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get -y upgrade
+RUN apt-get update && \
+    apt-get -y upgrade && \ 
+    apt-get install -yq kali-linux-headless
 RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
     sudo \
     openssh-server \
     python2 \
+    python3 \
     dialog \
     firefox-esr \
     inetutils-ping \
@@ -25,7 +25,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
 RUN apt-get -y autoremove && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/* && \
-    useradd -m -c "Kali Linux" -s /bin/bash -d /home/kali kali && \
+    useradd -m -c "kali" -s /bin/bash -d /home/kali kali && \
     sed -i "s/#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/g" /etc/ssh/sshd_config && \
     sed -i "s/off/remote/g" /usr/share/novnc/app/ui.js && \
     echo "kali ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
