@@ -1,20 +1,21 @@
 services:
   kalilinux:
-    hostname: kalilinux.lab
+    hostname: kali
     build:
       context: ./
       dockerfile: Dockerfile
-    image: 'csalab/kalilinux-docker:latest'
-    restart: always
+    image: 'kalilinux-docker-vnc-custom:lastest'
     cap_add:
       - NET_ADMIN
     ports:
       - ${BIND:-0.0.0.0:8080}:8080
+      - "8088:8088" # for vs-code remote
+      - "2222:22"
     environment:
-      - SHELL=/bin/bash
-      - PASSWORD=${PASSWORD:-kalilinux}
+      - SHELL=/bin/zsh
+      - PASSWORD=${PASSWORD:-kali}
     volumes:
-      - data:/home/kali/Desktop
+      - ./data:/home/kali/
     entrypoint: ["/bin/bash", "/startup.sh"]
 
 volumes:
