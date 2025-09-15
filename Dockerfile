@@ -1,7 +1,8 @@
 FROM kalilinux/kali-rolling:latest
 RUN apt-get update && \
-    apt-get -y upgrade && \ 
-    apt-get install -yq kali-linux-headless
+    apt-get -y upgrade
+# apt-get install -yq kali-linux-headless
+
 RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
     sudo \
     openssh-server \
