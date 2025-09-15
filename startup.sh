@@ -23,10 +23,18 @@ chmod 600 "$CONF/passwd"
 if [ ! -x "$HOME/.vnc/xstartup" ]; then
   mkdir -p "$HOME/.vnc"
   cat > "$HOME/.vnc/xstartup" <<'EOF'
-#!/bin/sh
+#!/bin/bash
+export XKL_XMODMAP_DISABLE=1
 unset SESSION_MANAGER
 unset DBUS_SESSION_BUS_ADDRESS
-startxfce4 &
+
+# Start D-Bus session
+if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+    eval `dbus-launch --sh-syntax --exit-with-session`
+fi
+
+# Start desktop environment
+exec startxfce4
 EOF
   chmod +x "$HOME/.vnc/xstartup"
 fi

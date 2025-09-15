@@ -66,6 +66,7 @@ ENV GOROOT=/usr/local/go
 
 # Create Go workspace directory
 RUN mkdir -p /home/kali/go/{bin,src,pkg}
+# for vnc web client
 EXPOSE 8080
 # for vscode server
 EXPOSE 8088
