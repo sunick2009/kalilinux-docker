@@ -38,6 +38,12 @@ RUN apt-get update && \
     sh -c 'echo "deb [arch=arm64,armhf,amd64 signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list' && \
     apt-get update && \
     apt-get install -yq code
+
+# Install Go 1.25.1
+RUN wget -q https://golang.org/dl/go1.25.1.linux-amd64.tar.gz -O /tmp/go1.25.1.linux-amd64.tar.gz && \
+    rm -rf /usr/local/go && \
+    tar -C /usr/local -xzf /tmp/go1.25.1.linux-amd64.tar.gz && \
+    rm /tmp/go1.25.1.linux-amd64.tar.gz
 RUN apt-get -y autoremove && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/* && \
@@ -54,6 +60,12 @@ USER kali
 WORKDIR /home/kali
 ENV PASSWORD=kalilinux
 ENV SHELL=/bin/bash
+ENV PATH=/usr/local/go/bin:$PATH
+ENV GOPATH=/home/kali/go
+ENV GOROOT=/usr/local/go
+
+# Create Go workspace directory
+RUN mkdir -p /home/kali/go/{bin,src,pkg}
 EXPOSE 8080
 # for vscode server
 EXPOSE 8088
