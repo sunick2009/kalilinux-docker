@@ -13,12 +13,18 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
     inetutils-ping \
     htop \
     nano \
+    zsh \
+    curl \
+    git \
     net-tools \
     tigervnc-standalone-server \
     tigervnc-xorg-extension \
     tigervnc-viewer \
     novnc \
-    dbus-x11
+    dbus-x11 \
+    xterm \
+    x11-xserver-utils
+
 RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
     xfce4-goodies \
     kali-desktop-xfce && \
@@ -31,7 +37,9 @@ RUN apt-get -y autoremove && \
     sed -i "s/off/remote/g" /usr/share/novnc/app/ui.js && \
     echo "kali ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
     mkdir /run/dbus && \
-    touch /usr/share/novnc/index.htm
+    touch /usr/share/novnc/index.htm && \
+    mkdir -p /home/kali/.vnc && \
+    chown -R kali:kali /home/kali/.vnc
 COPY startup.sh /startup.sh
 USER kali
 WORKDIR /home/kali
