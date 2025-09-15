@@ -10,7 +10,6 @@ services:
     ports:
       - ${BIND:-0.0.0.0:8080}:8080
       - "8088:8088" # for vs-code remote
-      - "2222:22"
     environment:
       - SHELL=/bin/zsh
       - PASSWORD=${PASSWORD:-kali}
