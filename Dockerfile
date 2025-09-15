@@ -29,6 +29,15 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
     xfce4-goodies \
     kali-desktop-xfce && \
     apt-get -y full-upgrade
+
+# Install VS Code
+RUN apt-get update && \
+    apt-get install -yq wget gpg && \
+    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg && \
+    install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/ && \
+    sh -c 'echo "deb [arch=arm64,armhf,amd64 signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list' && \
+    apt-get update && \
+    apt-get install -yq code
 RUN apt-get -y autoremove && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/* && \
@@ -46,4 +55,6 @@ WORKDIR /home/kali
 ENV PASSWORD=kalilinux
 ENV SHELL=/bin/bash
 EXPOSE 8080
+# for vscode server
+EXPOSE 8088
 ENTRYPOINT ["/bin/bash", "/startup.sh"]
