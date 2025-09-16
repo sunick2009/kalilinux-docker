@@ -14,9 +14,12 @@ services:
       SHELL: /bin/zsh
       PASSWORD: ${PASSWORD:-kali}
       TZ: Asia/Taipei
+      # DOTFILES_FORCE: 1   # force reinstall dotfiles
+      # DOTFILES_DISABLE: 1 # skip dotfiles installation
+      # BOOTSTRAP_STRICT: 0 # if bootstrap failed, still continue to start container
     volumes:
       - ./data:/home/kali/
-    entrypoint: ["/bin/bash", "/startup.sh"]
+    # entrypoint: ["/bin/bash", "/startup.sh"] // override entrypoint
 
 volumes:
   data: {}

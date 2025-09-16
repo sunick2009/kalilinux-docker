@@ -12,7 +12,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
     firefox-esr \
     inetutils-ping \
     htop \
-    nano \
+    vim \
+    neovim \
+    tmux \
     zsh \
     curl \
     git \
@@ -55,7 +57,14 @@ RUN apt-get -y autoremove && \
     touch /usr/share/novnc/index.htm && \
     mkdir -p /home/kali/.vnc && \
     chown -R kali:kali /home/kali/.vnc
+
 COPY startup.sh /startup.sh
+RUN chmod +x /startup.sh && chown kali:kali /startup.sh
+COPY bootstrap-dotfiles.sh /usr/local/bin/bootstrap-dotfiles.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/bootstrap-dotfiles.sh /usr/local/bin/entrypoint.sh \
+    && chown kali:kali /usr/local/bin/bootstrap-dotfiles.sh /usr/local/bin/entrypoint.sh
+
 USER kali
 WORKDIR /home/kali
 ENV PASSWORD=kalilinux
@@ -70,4 +79,4 @@ RUN mkdir -p /home/kali/go/{bin,src,pkg}
 EXPOSE 8080
 # for vscode server
 EXPOSE 8088
-ENTRYPOINT ["/bin/bash", "/startup.sh"]
+ENTRYPOINT ["/bin/zsh", "/usr/local/bin/entrypoint.sh"]
