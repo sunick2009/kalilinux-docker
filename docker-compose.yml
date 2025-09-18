@@ -18,8 +18,9 @@ services:
       # DOTFILES_DISABLE: 1 # skip dotfiles installation
       # BOOTSTRAP_STRICT: 0 # if bootstrap failed, still continue to start container
     volumes:
-      - ./data:/home/kali/
+      # Persistant kali home directory
+      - kali-home:/home/kali
     # entrypoint: ["/bin/bash", "/startup.sh"] // override entrypoint
 
 volumes:
-  data: {}
+  kali-home: {}
