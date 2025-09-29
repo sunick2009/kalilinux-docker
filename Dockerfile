@@ -83,6 +83,8 @@ ENV SHELL=/bin/bash
 ENV PATH=/usr/local/go/bin:$PATH
 ENV GOPATH=/home/kali/go
 ENV GOROOT=/usr/local/go
+ENV GOBIN=/home/kali/go/bin
+
 
 # Create Go workspace directory
 RUN mkdir -p /home/kali/go/{bin,src,pkg}
