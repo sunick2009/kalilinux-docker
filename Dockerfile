@@ -69,6 +69,85 @@ RUN apt-get -y autoremove && \
     mkdir -p /home/kali/.vnc && \
     chown -R kali:kali /home/kali/.vnc
 
+# Remove any screen locker to avoid conflict with VNC
+# 讓任何鎖屏呼叫失效
+RUN printf '#!/bin/sh\nexit 0\n' > /usr/local/bin/xflock4 && chmod +x /usr/local/bin/xflock4
+
+# 禁用自動啟動（兼容多種檔名）
+RUN <<'SH'
+set -e
+for f in /etc/xdg/autostart/*screensaver*.desktop; do
+  [ -f "$f" ] || continue
+  sed -i 's/^Exec=.*/Exec=true/' "$f"
+  if grep -q '^X-GNOME-Autostart-enabled=' "$f"; then
+    sed -i 's/^X-GNOME-Autostart-enabled=.*/X-GNOME-Autostart-enabled=false/' "$f"
+  else
+    echo 'X-GNOME-Autostart-enabled=false' >> "$f"
+  fi
+  grep -q '^Hidden=' "$f" || echo 'Hidden=true' >> "$f"
+done
+SH
+
+# 只對「存在且為檔案」的目標做 divert → 空殼
+RUN <<'SH'
+set -e
+for p in /usr/bin/xfce4-screensaver /usr/libexec/xfce4-screensaver /usr/libexec/xfce4-screensaver-dialog; do
+  if [ -f "$p" ]; then
+    dpkg-divert --quiet --rename --add "$p" || true
+    printf '#!/bin/sh\nexit 0\n' > "$p"
+    chmod +x "$p"
+  fi
+done
+SH
+
+# 建立登入後自動復位腳本
+RUN <<'SH'
+cat >/usr/local/bin/xfce-napless.sh <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+# 自動偵測 DISPLAY（預設 :1）
+if [[ -z "${DISPLAY:-}" ]]; then
+  dspy=$(ps -ef | awk '/Xtigervnc/ && $0 ~ /:[0-9]+/ {match($0, /:[0-9]+/); print substr($0, RSTART, RLENGTH); exit}')
+  export DISPLAY="${dspy:-:1}"
+fi
+
+# 等 X 就緒（用 xset，比 xdpyinfo 泛用）
+for i in $(seq 1 30); do
+  (command -v xset >/dev/null 2>&1 && xset q >/dev/null 2>&1) && break || sleep 1
+done
+
+# X11 層：關 screensaver/DPMS
+if command -v xset >/dev/null 2>&1; then
+  xset s off; xset s noblank; xset s 0 0; xset -dpms || true
+fi
+
+# XFCE 層：關鎖定
+if command -v xfconf-query >/dev/null 2>&1; then
+  xfconf-query -c xfce4-power-manager   -p /xfce4-power-manager/lock-screen-suspend-hibernate -n -t bool -s false || true
+  xfconf-query -c xfce4-screensaver     -p /lock-enabled            -n -t bool -s false      || true
+  xfconf-query -c xfce4-screensaver     -p /idle-activation-enabled -n -t bool -s false      || true
+fi
+
+# 清掉殘留鎖屏進程
+pkill -f -e "xfce4-screensaver|xfce4-screensaver-dialog" || true
+exit 0
+EOF
+chmod +x /usr/local/bin/xfce-napless.sh
+SH
+
+# 系統層 autostart（不吃 $HOME）
+RUN <<'SH'
+cat >/etc/xdg/autostart/10-napless.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=Disable sleep/lock (container)
+Exec=/usr/local/bin/xfce-napless.sh
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true
+EOF
+SH
+
 COPY startup.sh /startup.sh
 RUN chmod +x /startup.sh && chown kali:kali /startup.sh
 COPY bootstrap-dotfiles.sh /usr/local/bin/bootstrap-dotfiles.sh
