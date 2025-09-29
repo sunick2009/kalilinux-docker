@@ -41,11 +41,22 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -yq code
 
-# Install Go 1.25.1
-RUN wget -q https://golang.org/dl/go1.25.1.linux-amd64.tar.gz -O /tmp/go1.25.1.linux-amd64.tar.gz && \
+# Install Go 1.25.1 with automatic architecture detection
+RUN ARCH=$(dpkg --print-architecture) && \
+    case $ARCH in \
+        amd64) GO_ARCH="amd64" ;; \
+        arm64) GO_ARCH="arm64" ;; \
+        armhf) GO_ARCH="armv6l" ;; \
+        *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
+    esac && \
+    GO_VERSION="1.25.1" && \
+    GO_URL="https://golang.org/dl/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz" && \
+    echo "Installing Go ${GO_VERSION} for architecture: ${GO_ARCH}" && \
+    wget -q "$GO_URL" -O /tmp/go.tar.gz && \
     rm -rf /usr/local/go && \
-    tar -C /usr/local -xzf /tmp/go1.25.1.linux-amd64.tar.gz && \
-    rm /tmp/go1.25.1.linux-amd64.tar.gz
+    tar -C /usr/local -xzf /tmp/go.tar.gz && \
+    rm /tmp/go.tar.gz
+
 RUN apt-get -y autoremove && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/* && \
