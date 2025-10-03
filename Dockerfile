@@ -148,6 +148,68 @@ X-GNOME-Autostart-enabled=true
 EOF
 SH
 
+# --- Yazi & deps (Debian/Kali) ---
+# 基本與可選相依
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      ca-certificates curl unzip \
+      file jq ripgrep fzf zoxide poppler-utils ffmpeg imagemagick fd-find \
+      7zip || apt-get install -y p7zip-full && \
+    # Debian 將 fd 命名為 fdfind，建立一致的 fd 名稱
+    ln -sf /usr/bin/fdfind /usr/local/bin/fd && \
+    rm -rf /var/lib/apt/lists/*
+
+# 下載並安裝 Yazi（自動偵測架構 + 自動尋找解壓後的二進位路徑）
+ARG YAZI_VERSION=v25.5.31
+RUN set -eux; \
+    arch="$(dpkg --print-architecture)"; \
+    case "$arch" in \
+      amd64)   yarch="x86_64-unknown-linux-gnu" ;; \
+      arm64)   yarch="aarch64-unknown-linux-gnu" ;; \
+      i386)    yarch="i686-unknown-linux-gnu" ;; \
+      riscv64) yarch="riscv64gc-unknown-linux-gnu" ;; \
+      *) echo "unsupported arch: $arch"; exit 1 ;; \
+    esac; \
+    tmpdir="$(mktemp -d)"; \
+    url="https://github.com/sxyazi/yazi/releases/download/${YAZI_VERSION}/yazi-${yarch}.zip"; \
+    echo "[yazi] fetching $url"; \
+    curl -fsSL "$url" -o "$tmpdir/yazi.zip"; \
+    unzip -q "$tmpdir/yazi.zip" -d "$tmpdir"; \
+    bindir="$(find "$tmpdir" -maxdepth 2 -type f -name yazi -printf '%h\n' -quit)"; \
+    [ -n "$bindir" ] || { echo "yazi binary not found after unzip"; ls -R "$tmpdir"; exit 1; }; \
+    install -m 0755 "$bindir/yazi" /usr/local/bin/yazi; \
+    install -m 0755 "$bindir/ya"   /usr/local/bin/ya; \
+    rm -rf "$tmpdir"
+
+# 安裝 Zsh/Bash 的 `y` wrapper：離開 Yazi 後自動 cd 到最後所在子目錄（官方 Quick Start）
+RUN <<'SH'
+set -e
+# for Bash（/etc/profile.d）
+cat >/etc/profile.d/50-yazi-wrapper.sh <<'EOF'
+# Bash wrapper: use `y` instead of `yazi` to preserve CWD on exit
+y() {
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd < "$tmp" || true
+  [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+  rm -f -- "$tmp"
+}
+EOF
+
+# for Zsh（/etc/zsh/zshrc.d，Debian/Kali 會自動 source 這個目錄）
+mkdir -p /etc/zsh/zshrc.d
+cat >/etc/zsh/zshrc.d/50-yazi-wrapper.zsh <<'EOF'
+# Zsh wrapper
+function y() {
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd < "$tmp" || true
+  [[ -n "$cwd" && "$cwd" != "$PWD" ]] && builtin cd -- "$cwd"
+  rm -f -- "$tmp"
+}
+EOF
+SH
+# --- end Yazi ---
+
 COPY startup.sh /startup.sh
 RUN chmod +x /startup.sh && chown kali:kali /startup.sh
 COPY bootstrap-dotfiles.sh /usr/local/bin/bootstrap-dotfiles.sh
