@@ -208,6 +208,20 @@ function y() {
 }
 EOF
 SH
+# —— 安裝 CJK 與 Emoji（供 fallback）——
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      fonts-noto-cjk fonts-noto-color-emoji \
+  && rm -rf /var/lib/apt/lists/*
+
+# —— 安裝 Nerd Fonts「Symbols Only」（補齊常見圖示）——
+ARG NF_VERSION=v3.2.1
+RUN set -eux; \
+    mkdir -p /usr/local/share/fonts/NerdFonts/Symbols; \
+    curl -fL "https://github.com/ryanoasis/nerd-fonts/releases/download/${NF_VERSION}/NerdFontsSymbolsOnly.zip" \
+      -o /tmp/NerdFontsSymbolsOnly.zip; \
+    unzip -q /tmp/NerdFontsSymbolsOnly.zip -d /usr/local/share/fonts/NerdFonts/Symbols; \
+    rm -f /tmp/NerdFontsSymbolsOnly.zip; \
+    fc-cache -f
 # --- end Yazi ---
 
 COPY startup.sh /startup.sh
