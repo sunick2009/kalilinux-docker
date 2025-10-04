@@ -224,6 +224,12 @@ RUN set -eux; \
     fc-cache -f
 # --- end Yazi ---
 
+# burpsuite dependencies
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+    apt-get -yq install \
+    openjdk-21-jdk \
+    chromium
+
 COPY startup.sh /startup.sh
 RUN chmod +x /startup.sh && chown kali:kali /startup.sh
 COPY bootstrap-dotfiles.sh /usr/local/bin/bootstrap-dotfiles.sh
