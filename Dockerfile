@@ -1,3 +1,10 @@
+# ========= Add：Clone OnDemand noVNC-1.3.0 as novnc front-end with clipboard support =========
+FROM alpine:3.20 AS ondemand_fetch
+RUN apk add --no-cache git
+WORKDIR /tmp
+RUN git clone --depth=1 https://github.com/OSC/ondemand.git
+
+RUN test -f /tmp/ondemand/apps/dashboard/public/noVNC-1.3.0/vnc.html
 FROM kalilinux/kali-rolling:latest
 RUN apt-get update && \
     apt-get -y upgrade
@@ -68,6 +75,10 @@ RUN apt-get -y autoremove && \
     touch /usr/share/novnc/index.htm && \
     mkdir -p /home/kali/.vnc && \
     chown -R kali:kali /home/kali/.vnc
+
+COPY --from=ondemand_fetch /tmp/ondemand/apps/dashboard/public/noVNC-1.3.0 /opt/ondemand-novnc
+# Verify the copied noVNC files
+RUN test -f /opt/ondemand-novnc/vnc.html
 
 # Remove any screen locker to avoid conflict with VNC
 # 讓任何鎖屏呼叫失效

@@ -10,8 +10,7 @@ set -euo pipefail
 
 export DISPLAY=:1
 PASSWORD="${PASSWORD:-kalilinux}"
-GEOMETRY="${GEOMETRY:-1920x1080}"
-BIND="${BIND:-0.0.0.0:8080}"
+NOVNC_WEB="${NOVNC_WEB:-/opt/ondemand-novnc}"
 
 # Prepare TigerVNC passwd in new path
 CONF="$HOME/.config/tigervnc"
@@ -61,7 +60,12 @@ fi
 
 # Start noVNC proxy (prefer novnc_proxy, fallback to websockify)
 if [ -x /usr/share/novnc/utils/novnc_proxy ]; then
-  /usr/share/novnc/utils/novnc_proxy --listen "$BIND" --vnc 127.0.0.1:5901
+  /usr/share/novnc/utils/novnc_proxy \
+    --listen "$BIND" \
+    --vnc 127.0.0.1:5901 \
+    --web "$NOVNC_WEB"
 else
-  websockify --web=/usr/share/novnc "$BIND" 127.0.0.1:5901
+  websockify \
+    --web "$NOVNC_WEB" \
+    "$BIND" 127.0.0.1:5901
 fi
