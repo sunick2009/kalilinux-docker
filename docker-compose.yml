@@ -24,6 +24,21 @@ services:
       # Persistant kali home directory
       - kali-home:/home/kali
     # entrypoint: ["/bin/bash", "/startup.sh"] // override entrypoint
+  # gluetun:
+  #   image: qmcgaw/gluetun
+  #   ports:
+  #     - ${BIND:-0.0.0.0:8079}:8079 # noVNC
+  #     - "8088:8088" # for vs-code remote
+  #   cap_add:
+  #     - NET_ADMIN
+  #   devices:
+  #     - /dev/net/tun:/dev/net/tun
+  #   environment:
+  #     - VPN_SERVICE_PROVIDER=mullvad
+  #     - VPN_TYPE=wireguard
+  #     - WIREGUARD_PRIVATE_KEY=
+  #     - WIREGUARD_ADDRESSES=
+  #     - SERVER_CITIES=
 
 volumes:
   kali-home: {}
