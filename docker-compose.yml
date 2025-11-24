@@ -5,8 +5,11 @@ services:
       context: ./
       dockerfile: Dockerfile
     image: 'kalilinux-docker-vnc-custom:lastest'
+    # for openvpn tun
     cap_add:
       - NET_ADMIN
+    devices:
+      - /dev/net/tun
     ports:
       - ${BIND:-0.0.0.0:8079}:8079 # noVNC
       - "8088:8088" # for vs-code remote
