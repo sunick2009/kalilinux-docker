@@ -252,7 +252,7 @@ USER kali
 WORKDIR /home/kali
 ENV PASSWORD=kalilinux
 ENV SHELL=/bin/bash
-ENV PATH=/usr/local/go/bin:$PATH
+ENV PATH=/home/kali/.local/bin:/home/kali/go/bin:/usr/local/go/bin:$PATH
 ENV GOPATH=/home/kali/go
 ENV GOROOT=/usr/local/go
 ENV GOBIN=/home/kali/go/bin
