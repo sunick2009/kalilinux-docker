@@ -5,7 +5,7 @@ WORKDIR /tmp
 RUN git clone --depth=1 https://github.com/OSC/ondemand.git
 
 RUN test -f /tmp/ondemand/apps/dashboard/public/noVNC-1.3.0/vnc.html
-FROM kalilinux/kali-rolling:latest
+FROM kalilinux/kali-last-release:latest
 RUN apt-get update && \
     apt-get -y upgrade
 # apt-get install -yq kali-linux-headless
