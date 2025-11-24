@@ -1,6 +1,5 @@
 services:
   kalilinux:
-    hostname: kali
     build:
       context: ./
       dockerfile: Dockerfile
