@@ -10,6 +10,8 @@ set -euo pipefail
 
 export DISPLAY=:1
 PASSWORD="${PASSWORD:-kalilinux}"
+GEOMETRY="${GEOMETRY:-2560x1600}"
+BIND="${BIND:-0.0.0.0:8079}"
 NOVNC_WEB="${NOVNC_WEB:-/opt/ondemand-novnc}"
 
 # Prepare TigerVNC passwd in new path
