@@ -260,6 +260,9 @@ ENV GOBIN=/home/kali/go/bin
 
 # Create Go workspace directory
 RUN mkdir -p /home/kali/go/{bin,src,pkg}
+
+# Pre-install dotfiles as kali user
+RUN BOOTSTRAP_STRICT=0 DOTFILES_FORCE=1 /usr/local/bin/bootstrap-dotfiles.sh
 # for vnc web client
 EXPOSE 8079
 # for vscode server
