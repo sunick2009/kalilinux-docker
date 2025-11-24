@@ -10,7 +10,7 @@ This Docker Compose application provides:
 
 - **Kali Linux Desktop**: A complete XFCE desktop environment accessible via web browser
   - Default VNC password: `kalilinux`
-  - NoVNC web interface: Port `8080`
+  - NoVNC web interface: Port `8079`
   - VS Code Server: Port `8088` for remote development
   
 - **Development Environment**: 
@@ -60,7 +60,7 @@ To run this application, you need:
    ```
 
 6. Access the web application:
-   - **Kali Desktop via NoVNC**: http://localhost:8080/vnc.html
+   - **Kali Desktop via NoVNC**: http://localhost:8079/vnc.html
    - **VS Code Server**: http://localhost:8088 (for remote development)
 
 ### Advanced Usage
@@ -87,7 +87,7 @@ You can customize the application using these environment variables:
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `PASSWORD` | VNC password | `kalilinux` |
-| `BIND` | Address and port to bind the NoVNC server | `0.0.0.0:8080` |
+| `BIND` | Address and port to bind the NoVNC server | `0.0.0.0:8079` |
 | `GEOMETRY` | Desktop resolution | `1920x1080` |
 | `TZ` | Timezone | `Asia/Taipei` |
 

@@ -53,7 +53,7 @@ docker compose up -d
 # Start with custom configuration
 export PASSWORD="your-secure-password"
 export GEOMETRY="1920x1080"
-export BIND="0.0.0.0:8080"
+export BIND="0.0.0.0:8079"
 docker compose up -d
 
 # Force dotfiles reinstallation
@@ -65,7 +65,7 @@ docker compose up -d
 
 ```bash
 # Access NoVNC web desktop
-open http://localhost:8080/vnc.html
+open http://localhost:8079/vnc.html
 
 # Access VS Code Server
 open http://localhost:8088
@@ -188,7 +188,7 @@ docker compose logs --tail=50 kalilinux
 vncviewer localhost:5901
 
 # Test NoVNC web interface
-curl -I http://localhost:8080/vnc.html
+curl -I http://localhost:8079/vnc.html
 
 # Test resolution settings
 export GEOMETRY="1600x900"
@@ -258,7 +258,7 @@ docker compose exec kalilinux htop
 **Network Security:**
 - **Port Binding**: Default binding to all interfaces (`0.0.0.0`) - restrict in production
 - **Service Ports**: 
-  - 8080 (NoVNC) - Web desktop access
+  - 8079 (NoVNC) - Web desktop access
   - 8088 (VS Code) - Development server
   - 5901 (VNC) - Internal only, not exposed
 - **Container Capabilities**: `NET_ADMIN` capability enabled for security testing
